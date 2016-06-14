@@ -139,12 +139,16 @@ class MakerLegacy
             $categories[] = $ProductCategory->getCategory();
         }
         $form['Category']->setData($categories);
-        $Tags = array();
-        $ProductTags = $Product->getProductTag();
-        foreach ($ProductTags as $ProductTag) {
-            $Tags[] = $ProductTag->getTag();
+
+        //from 3.0.10
+        if(version_compare('3.0.10', Constant::VERSION, '<=')){
+            $Tags = array();
+            $ProductTags = $Product->getProductTag();
+            foreach ($ProductTags as $ProductTag) {
+                $Tags[] = $ProductTag->getTag();
+            }
+            $form['Tag']->setData($Tags);
         }
-        $form['Tag']->setData($Tags);
 
         $form->get('maker')->setData($ProductMaker->getMaker());
         if ('POST' === $app['request']->getMethod()) {
