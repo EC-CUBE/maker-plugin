@@ -31,7 +31,7 @@ services:
 
 # Install scripts. (runs after repo cloning)
 install:
-  - git clone https://github.com/lammn/LowStockAlert %PLUGIN_BASE_DIR%
+  - git clone https://github.com/lammn/maker-plugin %PLUGIN_BASE_DIR%
   - cd  %PLUGIN_BASE_DIR%
   - git archive -o %PLUGIN_CODE%.tar.gz HEAD
 
