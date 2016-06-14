@@ -34,13 +34,13 @@ services:
 install:
   - git clone https://github.com/lammn/maker-plugin %PLUGIN_BASE_DIR%
   - cd  %PLUGIN_BASE_DIR%
-  - sh -c "if [ ! '${PLUGIN_CODE}' = 'master' ]; then  git checkout -b ${PLUGIN_CODE}; fi"
+  - sh -c "if [ ! '${PLUGIN_VERSION}' = 'master' ]; then  git checkout -b ${PLUGIN_VERSION} refs/tags/${PLUGIN_VERSION}; fi"
   - git archive -o %PLUGIN_CODE%.tar.gz HEAD
 
   - git clone https://github.com/EC-CUBE/ec-cube.git %BASE_DIR%
   - cd %BASE_DIR%
   # checkout version now
-  - sh -c "if [ ! '${ECCUBE_VERSION}' = 'master' ]; then  git checkout -b ${ECCUBE_VERSION}; fi"
+  - sh -c "if [ ! '${ECCUBE_VERSION}' = 'master' ]; then  git checkout -b ${ECCUBE_VERSION} refs/tags/${ECCUBE_VERSION}; fi"
   # Set MySQL.
   - cp tests/my.cnf c:\
   - SET PATH=C:\Program Files\MySql\MySQL Server 5.7\bin\;%PATH%
