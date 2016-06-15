@@ -13,7 +13,7 @@ namespace Plugin\Maker;
 
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Eccube\Common\Constant;
-
+use Eccube\Event\EventArgs;
 class Maker
 {
     private $app;
@@ -34,9 +34,9 @@ class Maker
         $this->legacyEvent->onRenderAdminProductEditBefore($event);
     }
 
-    public function onResponseAdminProductEditAfter()
+    public function onResponseAdminProductEditAfter(EventArgs $event)
     {
-        $this->legacyEvent->onAdminProductEditAfter();
+        $this->legacyEvent->onAdminProductEditAfter($event);
     }
 
     public function onResponseProductsDetailBefore(FilterResponseEvent $event)
@@ -60,12 +60,12 @@ class Maker
         $this->legacyEvent->onRenderAdminProductEditBefore($event);
     }
 
-    public function onAdminProductEditAfter()
+    public function onAdminProductEditAfter(EventArgs $event)
     {
         if ($this->supportNewHookPoint()) {
             return;
         }
-        $this->legacyEvent->onAdminProductEditAfter();
+        $this->legacyEvent->onAdminProductEditAfter($event);
     }
 
     public function onRenderProductsDetailBefore(FilterResponseEvent $event)

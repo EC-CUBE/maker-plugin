@@ -15,7 +15,7 @@ use Eccube\Common\Constant;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-
+use Eccube\Event\EventArgs;
 class MakerLegacy
 {
     private $app;
@@ -100,19 +100,19 @@ class MakerLegacy
     }
 
 
-    public function onAdminProductEditAfter()
+    public function onAdminProductEditAfter(EventArgs $event)
     {
         $app = $this->app;
-
+        $Product = $event->getArgument('Product');
         if (!$app->isGranted('ROLE_ADMIN')) {
             return;
         }
-        $id = $app['request']->attributes->get('id');
+        $id = $Product->getId();
         $ProductMaker = $app['eccube.plugin.maker.repository.product_maker']->find($id);
         if (is_null($ProductMaker)) {
             $ProductMaker = new \Plugin\Maker\Entity\ProductMaker();
         }
-        $Product = $app['eccube.repository.product']->find($id);
+        //$Product = $app['eccube.repository.product']->find($id);
         if (!$Product) {
             throw new NotFoundHttpException();
         }
