@@ -87,7 +87,6 @@ class MakerController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $status = $repos->delete($TargetMaker);
-
             }
         }
 
