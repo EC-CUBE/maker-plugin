@@ -27,9 +27,9 @@ class MakerController
 
     public function index(Application $app, Request $request, $id)
     {
-        $repos = $app['eccube.plugin.maker.repository.maker'];
+    	$repos = $app['eccube.plugin.maker.repository.maker'];
 
-        $TargetMaker = new \Plugin\Maker\Entity\Maker();
+		$TargetMaker = new \Plugin\Maker\Entity\Maker();
 
         if ($id) {
             $TargetMaker = $repos->find($id);
@@ -56,11 +56,11 @@ class MakerController
                 }
             }
         }
-
+    	
         $Makers = $app['eccube.plugin.maker.repository.maker']->findAll();
 
         return $app->render('Maker/View/admin/maker.twig', array(
-            'form'   		=> $form->createView(),
+        	'form'   		=> $form->createView(),
             'Makers' 		=> $Makers,
             'TargetMaker' 	=> $TargetMaker,
         ));
@@ -68,10 +68,10 @@ class MakerController
 
     public function delete(Application $app, Request $request, $id)
     {
-        $repos = $app['eccube.plugin.maker.repository.maker'];
+    	$repos = $app['eccube.plugin.maker.repository.maker'];
 
         $TargetMaker = $repos->find($id);
-
+        
         if (!$TargetMaker) {
             throw new NotFoundHttpException();
         }
@@ -101,8 +101,8 @@ class MakerController
 
     public function up(Application $app, Request $request, $id)
     {
-        $repos = $app['eccube.plugin.maker.repository.maker'];
-
+    	$repos = $app['eccube.plugin.maker.repository.maker'];
+    	
         $TargetMaker = $repos->find($id);
         if (!$TargetMaker) {
             throw new NotFoundHttpException();
@@ -133,8 +133,8 @@ class MakerController
 
     public function down(Application $app, Request $request, $id)
     {
-        $repos = $app['eccube.plugin.maker.repository.maker'];
-
+    	$repos = $app['eccube.plugin.maker.repository.maker'];
+    	
         $TargetMaker = $repos->find($id);
         if (!$TargetMaker) {
             throw new NotFoundHttpException();
