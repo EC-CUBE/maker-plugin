@@ -1,15 +1,15 @@
 <?php
 
-namespace Plugin\Maker\Tests\Entity;
+namespace Plugin\Maker\Tests\Web;
 
 use Eccube\Tests\Web\Admin\AbstractAdminWebTestCase;
-use Plugin\Maker\Entity\Maker;
-use Plugin\Maker\Entity\MakerPlugin;
-use Plugin\Maker\Entity\ProductMaker;
+use Eccube\Common\Constant;
+use \Plugin\Maker\Entity\Maker;
+
 class UnitTest extends AbstractAdminWebTestCase
 {
-    const  MAKER_NAME = 'eccube_maker_name';
-    const  MAKER_URL = 'https://www.eccube.co.jp/';
+    const MAKER_NAME = 'eccube_maker_name';
+    const MAKER_URL = 'https://www.eccube.co.jp/';
     /**
      * メーカー作成画面のルーティング
      */
@@ -22,16 +22,23 @@ class UnitTest extends AbstractAdminWebTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful());
     }
 
+    public function testRoutingProductNew()
+    {
+        $this->client->request(
+            'GET',
+            $this->app->url('admin_product_product_new')
+        );
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
+    }
+
     /**
      * メーカー編集
      */
     public function testEditMaker()
     {
         $this->createMakerByPostSubmit();
-        //get maker from DB
         $maker_id = $this->getMakerByName();
         $Maker = $this->app['eccube.plugin.maker.repository.maker']->find($maker_id);
-        //compare it
         $this->expected = self::MAKER_NAME;
         $this->actual = $Maker->getName();
         $this->verify();
@@ -42,12 +49,18 @@ class UnitTest extends AbstractAdminWebTestCase
      */
     public function testDeleteMaker()
     {
-        $this->createMakerByPostSubmit();
-        //get maker from DB
-        $maker_id = $this->getMakerByName();
-        $Maker = $this->app['eccube.plugin.maker.repository.maker']->find($maker_id);
-        $status = $this->app['eccube.plugin.maker.repository.maker']->delete($Maker);
-        $this->assertTrue($status);
+        $Maker = $this->createMaker();
+        $maker_id = $Maker->getId();
+        $this->client->request(
+            'POST',
+            $this->app->url('admin_maker_delete', array('id' => $maker_id)),
+            array('admin_maker' => array(
+                '_token' => 'dummy'
+            ))
+        );
+        $this->expected = 1;
+        $this->actual = $Maker->getDelFlg();
+        $this->verify();
     }
 
     /**
@@ -56,11 +69,49 @@ class UnitTest extends AbstractAdminWebTestCase
     public function testProductMaker()
     {
         $Product = $this->createProductMaker();
-        //get maker from DB
         $ProductMaker = $this->app['eccube.plugin.maker.repository.product_maker']->find($Product->getId());
-        //compare it
         $this->expected = self::MAKER_URL;
         $this->actual = $ProductMaker->getMakerUrl();
+        $this->verify();
+    }
+
+    /**
+     * 商品登録画面にメーカー一緒に登録してUPテスト
+     */
+    public function testMakerUp()
+    {
+        $Maker = $this->createMaker();
+        $Maker1 = $this->createMaker();
+        //Up maker
+        $this->client->request(
+            'POST',
+            $this->app->url('admin_maker_up', array('id' => $Maker->getId())),
+            array('admin_maker' => array(
+                '_token' => 'dummy'
+            ))
+        );
+        $this->expected = $Maker->getRank();
+        $this->actual = $Maker1->getRank() + 1;
+        $this->verify();
+    }
+
+    /**
+     * 商品登録画面にメーカー一緒に登録してUPテスト
+     */
+    public function testMakerDown()
+    {
+        $Maker = $this->createMaker();
+        $Maker1 = $this->createMaker();
+        //down maker1
+        $this->client->request(
+            'POST',
+            $this->app->url('admin_maker_down', array('id' => $Maker1->getId())),
+            array('admin_maker' => array(
+                '_token' => 'dummy'
+            ))
+        );
+        $this->expected = $Maker->getRank();
+        $this->actual = $Maker1->getRank() + 1;
         $this->verify();
     }
 
@@ -75,8 +126,10 @@ class UnitTest extends AbstractAdminWebTestCase
                 'GET',
                 $this->app->url('product_detail', array('id' => $Product->getId()))
             );
-            $crawler->filter('#maker_code')->text();
-            $this->assertTrue(true);
+            $makerUrl = $crawler->filter('.item_code a')->text();
+            $this->expected = self::MAKER_URL;
+            $this->actual = $makerUrl;
+            $this->verify();
         }catch(\InvalidArgumentException $e){
             $this->assertTrue(false);
         }
@@ -100,7 +153,7 @@ class UnitTest extends AbstractAdminWebTestCase
     }
 
     /**
-     * カテゴリコンテンツのPOST Submit
+     * POST Submit
      */
     public function createMakerByPostSubmit()
     {
@@ -113,6 +166,14 @@ class UnitTest extends AbstractAdminWebTestCase
                 'name' => self::MAKER_NAME
             ))
         );
+    }
+
+    public function createMaker()
+    {
+        $Maker = new Maker();
+        $Maker->setName(self::MAKER_NAME);
+        $this->app['eccube.plugin.maker.repository.maker']->save($Maker);
+        return $Maker;
     }
 
     /**
@@ -146,8 +207,6 @@ class UnitTest extends AbstractAdminWebTestCase
             'description_detail' => $faker->text,
             'description_list' => $faker->paragraph,
             'Category' => null,
-            //'tag' => $faker->word,
-            'Tag' => array(1),
             'search_word' => $faker->word,
             'free_area' => $faker->text,
             'Status' => 1,
@@ -160,8 +219,14 @@ class UnitTest extends AbstractAdminWebTestCase
             'maker_url' => self::MAKER_URL,
             '_token' => 'dummy',
         );
+        //current version >= 3.0.10
+        if(version_compare('3.0.10', Constant::VERSION, '<=')){
+            $tag = array("Tag" => array(1));
+        }else{
+            $tag =  array("tag" => $faker->word);
+        }
+        $form += $tag;
         return $form;
     }
-
 
 }
