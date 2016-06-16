@@ -7,9 +7,9 @@ cache:
     - $HOME/.composer/cache
 
 php:
-  - 5.3
-#  - 5.4
-#  - 5.5
+#  - 5.3
+  - 5.4
+  - 5.5
   - 5.6
 #  - 7.0
 
@@ -22,10 +22,6 @@ env:
     - ECCUBE_VERSION=master DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
                             DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
     - ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
-
-    # ec-cube 3.0.8
-    - ECCUBE_VERSION=3.0.8 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
-    - ECCUBE_VERSION=3.0.8 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
 
     # ec-cube 3.0.9
     - ECCUBE_VERSION=3.0.9 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
@@ -51,10 +47,6 @@ before_script:
   - php app/console plugin:develop install --path=${HOME}/${PLUGIN_CODE}.tar.gz
   # enable plugin
   - php app/console plugin:develop enable --code=${PLUGIN_CODE}
-
-script:
-  # exec phpunit on ec-cube
-  - phpunit app/Plugin/${PLUGIN_CODE}/Tests
 
 after_script:
   # disable plugin
