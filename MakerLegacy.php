@@ -15,7 +15,7 @@ use Eccube\Common\Constant;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Eccube\Event\EventArgs;
+
 class MakerLegacy
 {
     private $app;
@@ -100,19 +100,24 @@ class MakerLegacy
     }
 
 
-    public function onAdminProductEditAfter(EventArgs $event)
+    public function onAdminProductEditAfter($event)
     {
         $app = $this->app;
-        $Product = $event->getArgument('Product');
         if (!$app->isGranted('ROLE_ADMIN')) {
             return;
         }
-        $id = $Product->getId();
+        if($event != null){
+            $Product = $event->getArgument('Product');
+            $id = $Product->getId();
+        }else{
+            $id = $app['request']->attributes->get('id');
+            $Product = $app['eccube.repository.product']->find($id);
+        }
+
         $ProductMaker = $app['eccube.plugin.maker.repository.product_maker']->find($id);
         if (is_null($ProductMaker)) {
             $ProductMaker = new \Plugin\Maker\Entity\ProductMaker();
         }
-        //$Product = $app['eccube.repository.product']->find($id);
         if (!$Product) {
             throw new NotFoundHttpException();
         }
@@ -151,9 +156,11 @@ class MakerLegacy
         }
 
         $form->get('maker')->setData($ProductMaker->getMaker());
+
         if ('POST' === $app['request']->getMethod()) {
+
             $form->handleRequest($app['request']);
-            if ($form->isValid()) {
+            if ($form->get('maker')->isValid()) {
                 $maker_id = $form->get('maker')->getData();
                 if ($maker_id) {
                     // 登録・更新
