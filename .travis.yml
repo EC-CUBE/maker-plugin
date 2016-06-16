@@ -48,6 +48,10 @@ before_script:
   # enable plugin
   - php app/console plugin:develop enable --code=${PLUGIN_CODE}
 
+script:
+  # exec phpunit on ec-cube
+  - phpunit app/Plugin/${PLUGIN_CODE}/Tests
+
 after_script:
   # disable plugin
   - php app/console plugin:develop disable --code=${PLUGIN_CODE}
