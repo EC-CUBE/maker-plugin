@@ -1,277 +1,278 @@
 <?php
 /*
-* This file is part of EC-CUBE
-*
-* Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
-* http://www.lockon.co.jp/
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ * This file is part of the Maker plugin
+ *
+ * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Plugin\Maker;
 
+use Doctrine\ORM\EntityRepository;
+use Eccube\Entity\Product;
+use Eccube\Event\EventArgs;
 use Eccube\Common\Constant;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Eccube\Event\TemplateEvent;
+use Plugin\Maker\Entity\ProductMaker;
+use Plugin\Maker\Repository\ProductMakerRepository;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Class Maker.
+ * New event on version EC-CUBE version >= 3.0.9 (new hook point).
+ */
 class Maker
 {
     private $app;
 
+    /**
+     * @var MakerLegacy old event
+     */
+    private $legacyEvent;
+
+    /**
+     * @var string target render on the front-end
+     */
+    private $makerTag = '<!--# MakerPlugin-Tag #-->';
+
+    /**
+     * Maker constructor.
+     *
+     * @param \Eccube\Application $app
+     */
     public function __construct($app)
     {
         $this->app = $app;
+        $this->legacyEvent = new MakerLegacy($app);
     }
 
-    public function onRenderAdminProductNewBefore(FilterResponseEvent $event)
+    /**
+     * New event function on version >= 3.0.9 (new hook point)
+     * Add/Edit product trigger.
+     *
+     * @param EventArgs $event
+     */
+    public function onAdminProductInit(EventArgs $event)
     {
-        $app = $this->app;
-        if (!$this->app->isGranted('ROLE_ADMIN')) {
-            return;
-        }
+        /**
+         * @var FormBuilder $builder
+         */
+        $builder = $event->getArgument('builder');
 
-        $request = $event->getRequest();
-        $response = $event->getResponse();
-        $id = $request->attributes->get('id');
+        // Remove old extension
+        $builder->remove('maker')
+            ->remove('maker_url');
 
-        list($html, $form) = $this->getHtml($request, $response, $id);
-        $response->setContent($html);
+        // Add new extension
+        $builder
+            ->add('plg_maker', 'entity', array(
+                'label' => 'メーカー',
+                'class' => 'Plugin\Maker\Entity\Maker',
+                'query_builder' => function (EntityRepository $repository) {
+                    return $repository->createQueryBuilder('m')->orderBy('m.rank', 'DESC');
+                },
+                'property' => 'name',
+                'required' => false,
+                'empty_value' => '',
+                'mapped' => false,
+            ))
+            ->add('plg_maker_url', 'text', array(
+                'label' => 'URL',
+                'required' => false,
+                'constraints' => array(
+                    new Assert\Url(),
+                ),
+                'mapped' => false,
+                'attr' => array(
+                    'placeholder' => $this->app->trans('admin.maker.placeholder.url'),
+                ),
+            ));
 
-        if ('POST' === $request->getMethod()) {
-            // RedirectResponseかどうかで判定する.
+        /**
+         * @var Product $Product
+         */
+        $Product = $event->getArgument('Product');
+        $id = $Product->getId();
 
-            if (!$response instanceof RedirectResponse) {
-                return;
-            }
-
-            if (empty($id)) {
-                $location = explode('/', $response->headers->get('location'));
-                $url = explode('/', $this->app->url('admin_product_product_edit', array('id' => '0')));
-                $diffs = array_values(array_diff($location, $url));
-                $id = $diffs[0];
-            }
-
-            if ($form->isValid()) {
-                // 登録
-                $data = $form->getData();
-
-                $Makers = $this->app['eccube.plugin.maker.repository.maker']->findAll();
-
-                $Maker = $form->get('maker')->getData();
-                $makerUrl = $form->get('maker_url')->getData();
-
-                if (count($Makers) > 0 && !empty($Maker)) {
-
-                    $ProductMaker = new \Plugin\Maker\Entity\ProductMaker();
-
-                    $ProductMaker
-                        ->setId($id)
-                        ->setMakerUrl($makerUrl)
-                        ->setDelFlg(Constant::DISABLED)
-                        ->setMaker($Maker);
-
-                    $app['orm.em']->persist($ProductMaker);
-
-                    $app['orm.em']->flush($ProductMaker);
-                }
-            }
-        }
-
-        $event->setResponse($response);
-    }
-
-    public function onRenderAdminProductEditBefore(FilterResponseEvent $event)
-    {
-        $app = $this->app;
-        if (!$app->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
-        $request = $event->getRequest();
-        $response = $event->getResponse();
-        $id = $request->attributes->get('id');
-
-        list($html, $form) = $this->getHtml($request, $response, $id);
-        $response->setContent($html);
-
-        $event->setResponse($response);
-    }
-
-
-    public function onAdminProductEditAfter()
-    {
-        $app = $this->app;
-        if (!$app->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
-        $id = $app['request']->attributes->get('id');
-
-        $form = $app['form.factory']
-            ->createBuilder('admin_product')
-            ->getForm();
-
-        $ProductMaker = $app['eccube.plugin.maker.repository.product_maker']->find($id);
-
-        if (is_null($ProductMaker)) {
-            $ProductMaker = new \Plugin\Maker\Entity\ProductMaker();
-        }
-
-        $form->get('maker')->setData($ProductMaker->getMaker());
-
-        $form->handleRequest($app['request']);
-
-        if ('POST' === $app['request']->getMethod()) {
-
-            if ($form->isValid()) {
-
-                $maker_id = $form->get('maker')->getData();
-                if ($maker_id) {
-                // 登録・更新
-                    $Maker = $app['eccube.plugin.maker.repository.maker']->find($maker_id);
-                // ※setIdはなんだか違う気がする
-                    if ($id) {
-                        $ProductMaker->setId($id);
-                    }
-
-                    $ProductMaker
-                        ->setMakerUrl($form->get('maker_url')->getData())
-                        ->setDelFlg(0)
-                        ->setMaker($Maker);
-                        $app['orm.em']->persist($ProductMaker);
-                } else {
-                // 削除
-                // ※setIdはなんだか違う気がする
-                    $ProductMaker->setId($id);
-                    $app['orm.em']->remove($ProductMaker);
-                }
-
-                $app['orm.em']->flush();
-            }
-        }
-    }
-
-    private function getHtml($request, $response, $id)
-    {
-
-        // メーカーマスタから有効なメーカー情報を取得
-        $Makers = $this->app['eccube.plugin.maker.repository.maker']->findAll();
-
-        if (is_null($Makers)) {
-            $Makers = new \Plugin\Maker\Entity\Maker();
-        }
-
+        /**
+         * @var ProductMaker $ProductMaker
+         */
         $ProductMaker = null;
 
         if ($id) {
-            // 商品メーカーマスタから設定されているなメーカー情報を取得
-            $ProductMaker = $this->app['eccube.plugin.maker.repository.product_maker']->find($id);
+            /**
+             * @var ProductMakerRepository $repository
+             */
+            $repository = $this->app['eccube.plugin.maker.repository.product_maker'];
+            $ProductMaker = $repository->find($id);
         }
 
-        // 商品登録・編集画面のHTMLを取得し、DOM化
-        $crawler = new Crawler($response->getContent());
-
-        $form = $this->app['form.factory']
-            ->createBuilder('admin_product')
-            ->getForm();
-
-        if ($ProductMaker) {
-            // 既に登録されている商品メーカー情報が設定されている場合、初期選択
-            $form->get('maker')->setData($ProductMaker->getMaker());
-            $form->get('maker_url')->setData($ProductMaker->getMakerUrl());
-        }
-
-        $form->handleRequest($request);
-
-        $parts = $this->app->renderView(
-            'Maker/View/admin/product_maker.twig',
-            array('form' => $form->createView())
-        );
-
-        // form1の最終項目に追加(レイアウトに依存
-        $html = $this->getHtmlFromCrawler($crawler);
-
-        try {
-            $oldHtml = $crawler->filter('#form1 .accordion')->last()->html();
-            $newHtml = $oldHtml.$parts;
-            $html = str_replace($oldHtml, $newHtml, $html);
-        } catch (\InvalidArgumentException $e) {
-            // no-op
-        }
-
-        return array($html, $form);
-
-    }
-
-
-    public function onRenderProductsDetailBefore(FilterResponseEvent $event)
-    {
-        $app = $this->app;
-        $request = $event->getRequest();
-        $response = $event->getResponse();
-        $id = $request->attributes->get('id');
-
-        $ProductMaker = null;
-
-        if ($id) {
-            // 商品メーカーマスタから設定されているなメーカー情報を取得
-            $ProductMaker = $this->app['eccube.plugin.maker.repository.product_maker']->find($id);
-        }
         if (!$ProductMaker) {
             return;
         }
 
-        $Maker = $ProductMaker->getMaker();
-
-        if (is_null($Maker)) {
-            // 商品メーカーマスタにデータが存在しないまたは削除されていれば無視する
-            return;
-        }
-
-        // HTMLを取得し、DOM化
-        $crawler = new Crawler($response->getContent());
-        $html = $this->getHtmlFromCrawler($crawler);
-
-        if ($ProductMaker) {
-            $parts = $this->app->renderView(
-                'Maker/View/default/maker.twig',
-                array(
-                    'maker_name' => $ProductMaker->getMaker()->getName(),
-                    'maker_url' => $ProductMaker->getMakerUrl(),
-                )
-            );
-
-            try {
-                // ※商品コードの下に追加
-                $parts_item_code = $crawler->filter('.item_code')->html();
-                $new_html = $parts_item_code.$parts;
-                $html = str_replace($parts_item_code, $new_html, $html);
-            } catch (\InvalidArgumentException $e) {
-                // no-op
-            }
-        }
-
-        $response->setContent($html);
-        $event->setResponse($response);
+        $builder->get('plg_maker')->setData($ProductMaker->getMaker());
+        $builder->get('plg_maker_url')->setData($ProductMaker->getMakerUrl());
     }
 
     /**
-     * 解析用HTMLを取得.
+     * New event function on version >= 3.0.9 (new hook point)
+     * Save event
      *
-     * @param Crawler $crawler
-     *
-     * @return string
+     * @param EventArgs $eventArgs
      */
-    private function getHtmlFromCrawler(Crawler $crawler)
+    public function onAdminProductComplete(EventArgs $eventArgs)
     {
-        $html = '';
-        foreach ($crawler as $domElement) {
-            $domElement->ownerDocument->formatOutput = true;
-            $html .= $domElement->ownerDocument->saveHTML();
+        /**
+         * @var Form $form
+         */
+        $form = $eventArgs->getArgument('form');
+
+        /**
+         * @var Product $Product
+         */
+        $Product = $eventArgs->getArgument('Product');
+
+        /**
+         * @var ProductMakerRepository $repository
+         */
+        $repository = $this->app['eccube.plugin.maker.repository.product_maker'];
+        /**
+         * @var ProductMaker $ProductMaker
+         */
+        $ProductMaker = $repository->find($Product);
+        if (!$ProductMaker) {
+            $ProductMaker = new ProductMaker();
         }
 
-        return html_entity_decode($html, ENT_NOQUOTES, 'UTF-8');
+        $maker = $form->get('plg_maker')->getData();
+        if (!$maker) {
+            if ($ProductMaker->getId()) {
+                $this->app['orm.em']->remove($ProductMaker);
+                $this->app['orm.em']->flush($ProductMaker);
+            }
+
+            return;
+        }
+
+        $makerUrl = $form->get('plg_maker_url')->getData();
+
+        $ProductMaker
+            ->setId($Product->getId())
+            ->setMakerUrl($makerUrl)
+            ->setDelFlg(Constant::DISABLED)
+            ->setMaker($maker);
+        /**
+         * @var EntityRepository $this->app['orm.em']
+         */
+        $this->app['orm.em']->persist($ProductMaker);
+        $this->app['orm.em']->flush($ProductMaker);
+    }
+
+    /**
+     * New event function on version >= 3.0.9 (new hook point)
+     * Product detail render (front).
+     *
+     * @param TemplateEvent $event
+     */
+    public function onRenderProductsDetail(TemplateEvent $event)
+    {
+        $parameters = $event->getParameters();
+        /**
+         * @var Product $Product
+         */
+        $Product = $parameters['Product'];
+
+        if (!$Product) {
+            return;
+        }
+
+        /**
+         * @var ProductMakerRepository $repository
+         */
+        $repository = $this->app['eccube.plugin.maker.repository.product_maker'];
+        /**
+         * @var ProductMaker $ProductMaker
+         */
+        $ProductMaker = $repository->find($Product);
+        if (!$ProductMaker) {
+            return;
+        }
+
+        /**
+         * @var \Twig_Environment $twig
+         */
+        $twig = $this->app['twig'];
+
+        $twigAppend = $twig->getLoader()->getSource('Maker/Resource/template/default/maker.twig');
+
+        /**
+         * @var string $twigSource twig template.
+         */
+        $twigSource = $event->getSource();
+
+        // for plugin tag
+        if (strpos($twigSource, $this->makerTag)) {
+            $twigNew = $this->makerTag.$twigAppend;
+            $twigSource = str_replace($this->makerTag, $twigNew, $twigSource);
+        } else {
+            // For old and new ec-cube version
+            $search = '/(<div id="relative_category_box")|(<div class="relative_cat")/';
+            $twigNew = $twigAppend.'<div id="relative_category_box" class="relative_cat"';
+            $twigSource = preg_replace($search, $twigNew, $twigSource);
+        }
+
+        $event->setSource($twigSource);
+
+        $parameters['maker_name'] = $ProductMaker->getMaker()->getName();
+        $parameters['maker_url'] = $ProductMaker->getMakerUrl();
+        $event->setParameters($parameters);
+    }
+
+    /**
+     * Add product trigger.
+     *
+     * @param FilterResponseEvent $event
+     *
+     * @deprecated for since v3.0.0, to be removed in 3.1
+     */
+    public function onAdminProduct(FilterResponseEvent $event)
+    {
+        if ($this->supportNewHookPoint()) {
+            return;
+        }
+
+        $this->legacyEvent->onAdminProduct($event);
+    }
+
+    /**
+     * Product detail render (front).
+     *
+     * @param FilterResponseEvent $event
+     *
+     * @deprecated for since v3.0.0, to be removed in 3.1
+     */
+    public function onRenderProductsDetailBefore(FilterResponseEvent $event)
+    {
+        if ($this->supportNewHookPoint()) {
+            return;
+        }
+
+        $this->legacyEvent->onRenderProductsDetailBefore($event);
+    }
+
+    /**
+     * v3.0.9以降のフックポイントに対応しているのか.
+     *
+     * @return bool
+     */
+    private function supportNewHookPoint()
+    {
+        return version_compare('3.0.9', Constant::VERSION, '<=');
     }
 }
