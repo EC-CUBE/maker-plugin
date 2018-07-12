@@ -10,58 +10,55 @@
 
 namespace Plugin\Maker\Entity;
 
-use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping as ORM;
 use Eccube\Entity\AbstractEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Maker.
+ *
+ * @ORM\Table(name="plg_maker")
+ * @ORM\Entity(repositoryClass="Plugin\Maker\Repository\MakerRepository")
  */
 class Maker extends AbstractEntity
 {
     /**
      * @var int
+     *
+     * @ORM\Column(name="id", type="integer", options={"unsigned":true})
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="sort_no", type="integer")
      */
-    private $rank;
-
-    /**
-     * @var int
-     */
-    private $del_flg;
+    private $sort_no;
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="create_date", type="datetimetz")
      */
     private $create_date;
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="update_date", type="datetimetz")
      */
     private $update_date;
-
-    /**
-     * Set maker id.
-     *
-     * @param string $id
-     *
-     * @return Maker
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
 
     /**
      * Get id.
@@ -98,51 +95,27 @@ class Maker extends AbstractEntity
     }
 
     /**
-     * Get rank.
+     * Get sort_no.
      *
      * @return int
      */
-    public function getRank()
+    public function getSortNo()
     {
-        return $this->rank;
+        return $this->sort_no;
     }
 
     /**
-     * Set rank.
+     * Set sort no.
      *
-     * @param int $rank
+     * @param int $sortNo
      *
      * @return Maker
      */
-    public function setRank($rank)
+    public function setSortNo($sortNo)
     {
-        $this->rank = $rank;
+        $this->sort_no = $sortNo;
 
         return $this;
-    }
-
-    /**
-     * Set del_flg.
-     *
-     * @param int $delFlg
-     *
-     * @return Maker
-     */
-    public function setDelFlg($delFlg)
-    {
-        $this->del_flg = $delFlg;
-
-        return $this;
-    }
-
-    /**
-     * Get del_flg.
-     *
-     * @return int
-     */
-    public function getDelFlg()
-    {
-        return $this->del_flg;
     }
 
     /**
@@ -200,8 +173,8 @@ class Maker extends AbstractEntity
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addConstraint(new UniqueEntity(array(
+        $metadata->addConstraint(new UniqueEntity([
             'fields' => 'name',
-        )));
+        ]));
     }
 }
