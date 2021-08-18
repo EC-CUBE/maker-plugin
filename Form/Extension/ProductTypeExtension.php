@@ -87,4 +87,12 @@ class ProductTypeExtension extends AbstractTypeExtension
     {
         return ProductType::class;
     }
+
+    /**
+     * Return the class of the type being extended.
+     */
+    public static function getExtendedTypes(): iterable
+    {
+        return [ProductType::class];
+    }
 }
