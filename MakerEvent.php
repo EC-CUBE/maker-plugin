@@ -11,7 +11,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4;
+namespace Plugin\Maker42;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Eccube\Event\TemplateEvent;
@@ -37,6 +37,6 @@ class MakerEvent implements EventSubscriberInterface
      */
     public function onTemplateProductDetail(TemplateEvent $templateEvent)
     {
-        $templateEvent->addSnippet('@Maker4/default/maker.twig');
+        $templateEvent->addSnippet('@Maker42/default/maker.twig');
     }
 }

@@ -11,7 +11,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4\Entity;
+namespace Plugin\Maker42\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Eccube\Entity\AbstractEntity;
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * Class Maker.
  *
  * @ORM\Table(name="plg_maker")
- * @ORM\Entity(repositoryClass="Plugin\Maker4\Repository\MakerRepository")
+ * @ORM\Entity(repositoryClass="Plugin\Maker42\Repository\MakerRepository")
  */
 class Maker extends AbstractEntity
 {

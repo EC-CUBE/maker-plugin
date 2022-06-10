@@ -11,11 +11,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4\Repository;
+namespace Plugin\Maker42\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Plugin\Maker4\Entity\Maker;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Plugin\Maker42\Entity\Maker;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Maker.
@@ -28,10 +28,10 @@ class MakerRepository extends ServiceEntityRepository
     /**
      * MakerRepository constructor.
      *
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      * @param string $entityClass
      */
-    public function __construct(RegistryInterface $registry, $entityClass = Maker::class)
+    public function __construct(ManagerRegistry $registry, $entityClass = Maker::class)
     {
         parent::__construct($registry, $entityClass);
     }

@@ -11,11 +11,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4\Tests\Web;
+namespace Plugin\Maker42\Tests\Web;
 
 use Eccube\Entity\Product;
 use Faker\Generator;
-use Plugin\Maker4\Entity\Maker;
+use Plugin\Maker42\Entity\Maker;
 use Symfony\Component\HttpKernel\Client;
 use Eccube\Repository\ProductRepository;
 
@@ -43,7 +43,7 @@ class ProductDetailTest extends MakerWebCommon
     /**
      * Set up function.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->deleteAllRows(['plg_maker']);

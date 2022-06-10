@@ -11,13 +11,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4\Tests\Web\Admin;
+namespace Plugin\Maker42\Tests\Web\Admin;
 
 use Eccube\Common\Constant;
 use Faker\Generator;
-use Plugin\Maker4\Tests\Web\MakerWebCommon;
+use Plugin\Maker42\Tests\Web\MakerWebCommon;
 use Symfony\Component\DomCrawler\Crawler;
-use Plugin\Maker4\Repository\MakerRepository;
+use Plugin\Maker42\Repository\MakerRepository;
 
 /**
  * Class MakerControllerTest.
@@ -32,7 +32,7 @@ class MakerControllerTest extends MakerWebCommon
     /**
      * Set up function.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->deleteAllRows(['plg_maker']);
