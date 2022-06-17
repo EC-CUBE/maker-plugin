@@ -63,10 +63,10 @@ class MakerWebCommon extends AbstractAdminWebTestCase
             'free_area' => $faker->realText,
             'Status' => 1,
             'note' => $faker->realText,
-            'tags' => null,
-            'images' => null,
-            'add_images' => null,
-            'delete_images' => null,
+            'tags' => [],
+            'images' => [],
+            'add_images' => [],
+            'delete_images' => [],
             Constant::TOKEN_NAME => 'dummy',
         ];
 

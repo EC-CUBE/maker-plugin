@@ -32,7 +32,7 @@ class MakerControllerTest extends MakerWebCommon
     /**
      * Set up function.
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->deleteAllRows(['plg_maker']);
