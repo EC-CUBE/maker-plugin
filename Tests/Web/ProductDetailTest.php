@@ -84,7 +84,7 @@ class ProductDetailTest extends MakerWebCommon
         $crawler = $this->client->request('GET', $this->generateUrl('product_detail', ['id' => $productId]));
 
         $html = $crawler->filter('.ec-productRole__profile')->html();
-        $this->assertContains($this->Product->getMaker()->getName(), $html);
+        $this->assertStringContainsString($this->Product->getMaker()->getName(), $html);
         $this->assertNotContains('メーカーURL', $html);
     }
 
@@ -99,8 +99,8 @@ class ProductDetailTest extends MakerWebCommon
         $crawler = $this->client->request('GET', $this->generateUrl('product_detail', ['id' => $productId]));
 
         $html = $crawler->filter('.ec-productRole__profile')->html();
-        $this->assertContains($this->Product->getMaker()->getName(), $html);
-        $this->assertContains($this->Product->getMakerUrl(), $html);
+        $this->assertStringContainsString($this->Product->getMaker()->getName(), $html);
+        $this->assertStringContainsString($this->Product->getMakerUrl(), $html);
     }
 
     /**

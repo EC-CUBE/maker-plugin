@@ -80,7 +80,7 @@ class MakerControllerTest extends MakerWebCommon
             ['maker' => $formData]
         );
         // Check message
-        $this->assertContains('入力されていません。', $crawler->filter('#form1 .form-error-message')->html());
+        $this->assertStringContainsString('入力されていません。', $crawler->filter('#form1 .form-error-message')->html());
     }
 
     /**
@@ -99,7 +99,7 @@ class MakerControllerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertContains('既に使用されています。', $crawler->filter('#form1 .form-error-message')->html());
+        $this->assertStringContainsString('既に使用されています。', $crawler->filter('#form1 .form-error-message')->html());
     }
 
     /**
@@ -122,11 +122,11 @@ class MakerControllerTest extends MakerWebCommon
          */
         $crawler = $this->client->followRedirect();
         // Check message
-        $this->assertContains('メーカーを保存しました。', $crawler->filter('.alert')->html());
+        $this->assertStringContainsString('メーカーを保存しました。', $crawler->filter('.alert')->html());
 
         // check item name
         $addItem = $crawler->filter('.sortable-container .sortable-item')->first()->text();
-        $this->assertContains($formData['name'], $addItem);
+        $this->assertStringContainsString($formData['name'], $addItem);
     }
 
     /**
@@ -148,7 +148,7 @@ class MakerControllerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertContains('入力されていません。', $crawler->filter('#formInline'.$Maker->getId().' .form-error-message')->html());
+        $this->assertStringContainsString('入力されていません。', $crawler->filter('#formInline'.$Maker->getId().' .form-error-message')->html());
     }
 
     /**
@@ -172,7 +172,7 @@ class MakerControllerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertContains('既に使用されています。', $crawler->filter('#formInline'.$Maker->getId().' .form-error-message')->html());
+        $this->assertStringContainsString('既に使用されています。', $crawler->filter('#formInline'.$Maker->getId().' .form-error-message')->html());
     }
 
 //    /**
@@ -212,11 +212,11 @@ class MakerControllerTest extends MakerWebCommon
 
         $crawler = $this->client->followRedirect();
         // Check message
-        $this->assertContains('メーカーを保存しました。', $crawler->filter('.alert')->html());
+        $this->assertStringContainsString('メーカーを保存しました。', $crawler->filter('.alert')->html());
 
         // Check item name
         $html = $crawler->filter('.sortable-container .sortable-item')->first()->text();
-        $this->assertContains($formData['name'], $html);
+        $this->assertStringContainsString($formData['name'], $html);
     }
 
     /**
@@ -280,10 +280,10 @@ class MakerControllerTest extends MakerWebCommon
         $crawler = $this->client->followRedirect();
 
         // Check message
-        $this->assertContains('メーカーを削除しました。', $crawler->filter('.alert')->html());
+        $this->assertStringContainsString('メーカーを削除しました。', $crawler->filter('.alert')->html());
 
         // Check item name
-        $this->assertEquals(0, $crawler->filter('.sortable-item')->count());
+        $this->assertSame(0, $crawler->filter('.sortable-item')->count());
 
         $this->assertNull($Maker->getId());
     }
