@@ -11,12 +11,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4\Tests\Web;
+namespace Plugin\Maker42\Tests\Web;
 
 use Eccube\Common\Constant;
 use Eccube\Tests\Web\Admin\AbstractAdminWebTestCase;
 use Faker\Generator;
-use Plugin\Maker4\Entity\Maker;
+use Plugin\Maker42\Entity\Maker;
 
 /**
  * Class MakerWebTestCase
@@ -63,10 +63,10 @@ class MakerWebCommon extends AbstractAdminWebTestCase
             'free_area' => $faker->realText,
             'Status' => 1,
             'note' => $faker->realText,
-            'tags' => null,
-            'images' => null,
-            'add_images' => null,
-            'delete_images' => null,
+            'tags' => [],
+            'images' => [],
+            'add_images' => [],
+            'delete_images' => [],
             Constant::TOKEN_NAME => 'dummy',
         ];
 

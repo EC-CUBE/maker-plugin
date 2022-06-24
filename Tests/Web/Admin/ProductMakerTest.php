@@ -11,10 +11,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4\Tests\Web\Admin;
+namespace Plugin\Maker42\Tests\Web\Admin;
 
 use Faker\Generator;
-use Plugin\Maker4\Tests\Web\MakerWebCommon;
+use Plugin\Maker42\Tests\Web\MakerWebCommon;
 use Symfony\Component\HttpKernel\Client;
 use Eccube\Repository\ProductRepository;
 
@@ -39,7 +39,7 @@ class ProductMakerTest extends MakerWebCommon
     /**
      * Set up function.
      */
-    public function setUp()
+    protected function setUp() :void
     {
         parent::setUp();
         $this->deleteAllRows(['plg_maker']);
@@ -53,7 +53,7 @@ class ProductMakerTest extends MakerWebCommon
     public function testProductNewRender()
     {
         $crawler = $this->client->request('GET', $this->generateUrl('admin_product_product_new'));
-        $this->assertContains('メーカー', $crawler->filter('body .c-container')->html());
+        $this->assertStringContainsString('メーカー', $crawler->filter('body .c-container')->html());
     }
 
     /**
@@ -62,7 +62,7 @@ class ProductMakerTest extends MakerWebCommon
     public function testProductNewWithoutMaker()
     {
         $crawler = $this->client->request('GET', $this->generateUrl('admin_product_product_new'));
-        $this->assertContains('メーカー', $crawler->filter('body .c-container')->html());
+        $this->assertStringContainsString('メーカー', $crawler->filter('body .c-container')->html());
     }
 
     /**
@@ -73,7 +73,7 @@ class ProductMakerTest extends MakerWebCommon
         $Maker = $this->createMaker();
 
         $crawler = $this->client->request('GET', $this->generateUrl('admin_product_product_new'));
-        $this->assertContains($Maker->getName(), $crawler->filter('body .c-container')->html());
+        $this->assertStringContainsString($Maker->getName(), $crawler->filter('body .c-container')->html());
     }
 
     /**
@@ -104,10 +104,10 @@ class ProductMakerTest extends MakerWebCommon
         $crawler = $client->followRedirect();
 
         // Check message
-        $this->assertContains('保存しました', $crawler->filter('.alert')->html());
+        $this->assertStringContainsString('保存しました', $crawler->filter('.alert')->html());
 
         // Check layout
-        $this->assertContains($formData[self::MAKER_URL], $crawler->filter('body .c-container')->html());
+        $this->assertStringContainsString($formData[self::MAKER_URL], $crawler->filter('body .c-container')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -142,7 +142,7 @@ class ProductMakerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertContains('有効な値ではありません。', $crawler->filter('.form-error-message')->html());
+        $this->assertStringContainsString('有効な値ではありません。', $crawler->filter('.form-error-message')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -184,7 +184,7 @@ class ProductMakerTest extends MakerWebCommon
         $crawler = $client->followRedirect();
 
         // Check message
-        $this->assertContains('保存しました', $crawler->filter('.alert')->html());
+        $this->assertStringContainsString('保存しました', $crawler->filter('.alert')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -220,7 +220,7 @@ class ProductMakerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertContains('有効なURLではありません。', $crawler->filter('.form-error-message')->html());
+        $this->assertStringContainsString('有効なURLではありません。', $crawler->filter('.form-error-message')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -263,7 +263,7 @@ class ProductMakerTest extends MakerWebCommon
         $crawler = $client->followRedirect();
 
         // Check message
-        $this->assertContains('保存しました', $crawler->filter('.alert')->html());
+        $this->assertStringContainsString('保存しました', $crawler->filter('.alert')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -281,7 +281,7 @@ class ProductMakerTest extends MakerWebCommon
         $Product = $this->createProduct();
 
         $crawler = $this->client->request('GET', $this->generateUrl('admin_product_product_edit', ['id' => $Product->getId()]));
-        $this->assertContains('メーカー', $crawler->filter('body .c-container')->html());
+        $this->assertStringContainsString('メーカー', $crawler->filter('body .c-container')->html());
     }
 
     /**
@@ -293,7 +293,7 @@ class ProductMakerTest extends MakerWebCommon
         $Maker = $this->createMaker();
 
         $crawler = $this->client->request('GET', $this->generateUrl('admin_product_product_edit', ['id' => $Product->getId()]));
-        $this->assertContains($Maker->getName(), $crawler->filter('body .c-container')->html());
+        $this->assertStringContainsString($Maker->getName(), $crawler->filter('body .c-container')->html());
     }
 
     /**
@@ -348,7 +348,7 @@ class ProductMakerTest extends MakerWebCommon
         $crawler = $client->followRedirect();
 
         // Check message
-        $this->assertContains('保存しました', $crawler->filter('.alert')->html());
+        $this->assertStringContainsString('保存しました', $crawler->filter('.alert')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -407,7 +407,7 @@ class ProductMakerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertContains('有効な値ではありません。', $crawler->filter('.form-error-message')->html());
+        $this->assertStringContainsString('有効な値ではありません。', $crawler->filter('.form-error-message')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -465,7 +465,7 @@ class ProductMakerTest extends MakerWebCommon
         $crawler = $client->followRedirect();
 
         // Check message
-        $this->assertContains('保存しました', $crawler->filter('.alert')->html());
+        $this->assertStringContainsString('保存しました', $crawler->filter('.alert')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -520,7 +520,7 @@ class ProductMakerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertContains('有効なURLではありません。', $crawler->filter('.form-error-message')->html());
+        $this->assertStringContainsString('有効なURLではありません。', $crawler->filter('.form-error-message')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -581,7 +581,7 @@ class ProductMakerTest extends MakerWebCommon
         $crawler = $client->followRedirect();
 
         // Check message
-        $this->assertContains('保存しました', $crawler->filter('.alert')->html());
+        $this->assertStringContainsString('保存しました', $crawler->filter('.alert')->html());
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);

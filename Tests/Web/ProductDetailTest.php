@@ -11,11 +11,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4\Tests\Web;
+namespace Plugin\Maker42\Tests\Web;
 
 use Eccube\Entity\Product;
 use Faker\Generator;
-use Plugin\Maker4\Entity\Maker;
+use Plugin\Maker42\Entity\Maker;
 use Symfony\Component\HttpKernel\Client;
 use Eccube\Repository\ProductRepository;
 
@@ -43,7 +43,7 @@ class ProductDetailTest extends MakerWebCommon
     /**
      * Set up function.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->deleteAllRows(['plg_maker']);
@@ -84,7 +84,7 @@ class ProductDetailTest extends MakerWebCommon
         $crawler = $this->client->request('GET', $this->generateUrl('product_detail', ['id' => $productId]));
 
         $html = $crawler->filter('.ec-productRole__profile')->html();
-        $this->assertContains($this->Product->getMaker()->getName(), $html);
+        $this->assertStringContainsString($this->Product->getMaker()->getName(), $html);
         $this->assertNotContains('メーカーURL', $html);
     }
 
@@ -99,8 +99,8 @@ class ProductDetailTest extends MakerWebCommon
         $crawler = $this->client->request('GET', $this->generateUrl('product_detail', ['id' => $productId]));
 
         $html = $crawler->filter('.ec-productRole__profile')->html();
-        $this->assertContains($this->Product->getMaker()->getName(), $html);
-        $this->assertContains($this->Product->getMakerUrl(), $html);
+        $this->assertStringContainsString($this->Product->getMaker()->getName(), $html);
+        $this->assertStringContainsString($this->Product->getMakerUrl(), $html);
     }
 
     /**

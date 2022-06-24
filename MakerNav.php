@@ -11,7 +11,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4;
+namespace Plugin\Maker42;
 
 use Eccube\Common\EccubeNav;
 

@@ -11,7 +11,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Plugin\Maker4\Entity;
+namespace Plugin\Maker42\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Eccube\Annotation as Eccube;
@@ -22,9 +22,9 @@ use Eccube\Annotation as Eccube;
 trait ProductTrait
 {
     /**
-     * @var \Plugin\Maker4\Entity\Maker
+     * @var \Plugin\Maker42\Entity\Maker
      *
-     * @ORM\ManyToOne(targetEntity="Plugin\Maker4\Entity\Maker")
+     * @ORM\ManyToOne(targetEntity="Plugin\Maker42\Entity\Maker")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="maker_id", referencedColumnName="id")
      * })
