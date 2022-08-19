@@ -161,19 +161,19 @@ file that was distributed with this source code.
                                             <div class="col-auto d-flex align-items-center"><i class="fa fa-bars text-ec-gray"></i></div>
                                             <div class="col d-flex align-items-center"><a>{{ Maker.name }}</a>
                                             </div>
-                                            <div class="col-auto text-right">
-                                                <a class="btn btn-ec-actionIcon mr-3 action-up{% if loop.first %} disabled{% endif %}" href="#"
+                                            <div class="col-auto text-end">
+                                                <a class="btn btn-ec-actionIcon me-3 action-up{% if loop.first %} disabled{% endif %}" href="#"
                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'admin.common.up'|trans }}">
                                                     <i class="fa fa-arrow-up fa-lg text-secondary"></i>
                                                 </a>
-                                                <a class="btn btn-ec-actionIcon mr-3 action-down{% if loop.last %} disabled{% endif %}" href="#"
+                                                <a class="btn btn-ec-actionIcon me-3 action-down{% if loop.last %} disabled{% endif %}" href="#"
                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'admin.common.down'|trans }}">
                                                     <i class="fa fa-arrow-down fa-lg text-secondary"></i>
                                                 </a>
-                                                <a class="btn btn-ec-actionIcon mr-3 action-edit" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'maker.admin.maker.edit'|trans }}">
+                                                <a class="btn btn-ec-actionIcon me-3 action-edit" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'maker.admin.maker.edit'|trans }}">
                                                     <i class="fa fa-pencil fa-lg text-secondary"></i>
                                                 </a>
-                                                <a class="btn btn-ec-actionIcon mr-3" data-bs-toggle="modal" data-bs-toggle="tooltip" data-bs-target="#confirmModal-{{ Maker.id }}" data-bs-placement="top" title="{{ 'admin.common.delete'|trans }}">
+                                                <a class="btn btn-ec-actionIcon me-3" data-bs-toggle="modal" data-bs-toggle="tooltip" data-bs-target="#confirmModal-{{ Maker.id }}" data-bs-placement="top" title="{{ 'admin.common.delete'|trans }}">
                                                     <i class="fa fa-close fa-lg text-secondary"></i>
                                                 </a>
                                             </div>
@@ -183,11 +183,11 @@ file that was distributed with this source code.
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title font-weight-bold">{{ 'maker.admin.delete.confirm'|trans }}</h5>
+                                                        <h5 class="modal-title fw-bold">{{ 'maker.admin.delete.confirm'|trans }}</h5>
                                                         <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
-                                                    <div class="modal-body text-left">
-                                                        <p class="text-left">{{ 'maker.admin.delete.confirm.message'|trans }}</p>
+                                                    <div class="modal-body text-start">
+                                                        <p class="text-start">{{ 'maker.admin.delete.confirm.message'|trans }}</p>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button class="btn btn-ec-sub" type="button" data-bs-dismiss="modal">{{ 'admin.common.cancel'|trans }}</button>
@@ -199,7 +199,7 @@ file that was distributed with this source code.
                                             </div>
                                         </div>
 
-                                        <form id="formInline{{ Maker.id }}" class="form-row d-none mode-edit" method="post" action="{{ url('maker_admin_index') }}">
+                                        <form id="formInline{{ Maker.id }}" class="row d-none mode-edit" method="post" action="{{ url('maker_admin_index') }}">
                                             {{ form_widget(forms[Maker.id]._token) }}
                                             <div class="col-auto align-items-center">
                                                 {{ form_widget(forms[Maker.id].name, {'attr': {'data-origin-value': forms[Maker.id].name.vars.value }}) }}
