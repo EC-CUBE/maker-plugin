@@ -80,7 +80,7 @@ class MakerControllerTest extends MakerWebCommon
             ['maker' => $formData]
         );
         // Check message
-        $this->assertStringContainsString('入力されていません。', $crawler->filter('#form1 .form-error-message')->html());
+        $this->assertStringContainsString('入力されていません。', $crawler->filter('#form1 .invalid-feedback')->html());
     }
 
     /**
@@ -99,7 +99,7 @@ class MakerControllerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertStringContainsString('既に使用されています。', $crawler->filter('#form1 .form-error-message')->html());
+        $this->assertStringContainsString('既に使用されています。', $crawler->filter('#form1 .invalid-feedback')->html());
     }
 
     /**
@@ -148,7 +148,7 @@ class MakerControllerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertStringContainsString('入力されていません。', $crawler->filter('#formInline'.$Maker->getId().' .form-error-message')->html());
+        $this->assertStringContainsString('入力されていません。', $crawler->filter('#formInline'.$Maker->getId().' .invalid-feedback')->html());
     }
 
     /**
@@ -172,7 +172,7 @@ class MakerControllerTest extends MakerWebCommon
         );
 
         // Check message
-        $this->assertStringContainsString('既に使用されています。', $crawler->filter('#formInline'.$Maker->getId().' .form-error-message')->html());
+        $this->assertStringContainsString('既に使用されています。', $crawler->filter('#formInline'.$Maker->getId().' .invalid-feedback')->html());
     }
 
 //    /**
