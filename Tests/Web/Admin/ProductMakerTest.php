@@ -44,7 +44,7 @@ class ProductMakerTest extends MakerWebCommon
         parent::setUp();
         $this->deleteAllRows(['plg_maker']);
 
-        $this->productRepository = self::$container->get(ProductRepository::class);
+        $this->productRepository = self::getContainer()->get(ProductRepository::class);
     }
 
     /**
