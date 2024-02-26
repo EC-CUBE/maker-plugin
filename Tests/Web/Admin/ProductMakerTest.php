@@ -14,6 +14,7 @@
 namespace Plugin\Maker42\Tests\Web\Admin;
 
 use Faker\Generator;
+use Eccube\Common\Constant;
 use Plugin\Maker42\Tests\Web\MakerWebCommon;
 use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\DomCrawler\Crawler;
@@ -146,7 +147,9 @@ class ProductMakerTest extends MakerWebCommon
         $errorMessages = $crawler->filter('.form-error-message')->each(function (Crawler $node): string {
             return $node->text();
         });
-        $this->assertStringContainsString('選択した値は無効です。', implode("\n", $errorMessages));
+        $versionParts = explode('-', Constant::VERSION);
+        $expectedMessage = version_compare(reset($versionParts), '4.3.0', '<') ? '有効な値ではありません。' : '選択した値は無効です。';
+        $this->assertStringContainsString($expectedMessage, implode("\n", $errorMessages));
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
@@ -417,7 +420,9 @@ class ProductMakerTest extends MakerWebCommon
         $errorMessages = $crawler->filter('.form-error-message')->each(function (Crawler $node): string {
             return $node->text();
         });
-        $this->assertStringContainsString('選択した値は無効です。', implode("\n", $errorMessages));
+        $versionParts = explode('-', Constant::VERSION);
+        $expectedMessage = version_compare(reset($versionParts), '4.3.0', '<') ? '有効な値ではありません。' : '選択した値は無効です。';
+        $this->assertStringContainsString($expectedMessage, implode("\n", $errorMessages));
 
         // Check database
         $Product = $this->productRepository->findOneBy([], ['id' => 'DESC']);
